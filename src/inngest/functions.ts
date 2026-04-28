@@ -57,6 +57,7 @@ export const execute = inngest.createFunction(
       return prisma.workflow.create({
         data: {
           name: 'workflow-from-inngest',
+          userId: event.data.userId,
         }
       });
     });
