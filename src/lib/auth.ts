@@ -3,7 +3,7 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 // If your Prisma file is located elsewhere, you can change the path
 import prisma from '@/lib/db';
-import { polarClient } from '@/lib/polar';
+import { polarClient } from './polar'
 
 export const auth = betterAuth({
     database: prismaAdapter(prisma, {
@@ -13,6 +13,10 @@ export const auth = betterAuth({
         enabled: true,
         autoSignIn: true,
     },
+    trustedOrigins: [
+        'https://3000-firebase-nodebase-1760493652353.cluster-fbfjltn375c6wqxlhoehbz44sk.cloudworkstations.dev',
+        'https://unrevoked-stoloniferous-rickey.ngrok-free.dev'
+    ],
     plugins: [
         polar({
             client: polarClient,
@@ -21,7 +25,7 @@ export const auth = betterAuth({
                 checkout({
                 products: [
                     {
-                        productId: '39f09a7d-4a33-4b99-9a1a-4101380a93c3',
+                        productId: '0ab49aff-3714-40d1-a7fa-e3afe24ad5ec',
                         slug: 'nodebase',
                     }
                 ],
