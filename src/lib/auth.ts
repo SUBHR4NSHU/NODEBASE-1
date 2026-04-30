@@ -13,10 +13,16 @@ export const auth = betterAuth({
         enabled: true,
         autoSignIn: true,
     },
-    trustedOrigins: [
-        'https://3000-firebase-nodebase-1760493652353.cluster-fbfjltn375c6wqxlhoehbz44sk.cloudworkstations.dev',
-        'https://unrevoked-stoloniferous-rickey.ngrok-free.dev'
-    ],
+    socialProviders: {
+        github: {
+            clientId: process.env.GITHUB_CLIENT_ID as string,
+            clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
+        },
+        google: {
+            clientId: process.env.GOOGLE_CLIENT_ID as string, 
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET as string, 
+        },
+    },
     plugins: [
         polar({
             client: polarClient,
@@ -25,7 +31,7 @@ export const auth = betterAuth({
                 checkout({
                 products: [
                     {
-                        productId: '0ab49aff-3714-40d1-a7fa-e3afe24ad5ec',
+                        productId: '39f09a7d-4a33-4b99-9a1a-4101380a93c3',
                         slug: 'nodebase',
                     }
                 ],
@@ -35,5 +41,4 @@ export const auth = betterAuth({
              portal()]
         }),
     ]
-
 });
