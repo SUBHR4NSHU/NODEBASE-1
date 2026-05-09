@@ -10,7 +10,8 @@
     "ngrok:dev": "ngrok http --url=bluegill-witty-factually.ngrok-free.app 3000",
     "format": "biome format --write",
     "inngest:dev": "inngest-cli dev",
-    "dev:all": "dotenv -- mprocs"
+    "dev:all": "dotenv -- mprocs",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.71",
