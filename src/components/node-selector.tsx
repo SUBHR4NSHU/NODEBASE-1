@@ -86,7 +86,90 @@ const executionNodes: NodeTypeOption[] = [
         description: 'Send a message to Slack',
         icon: '/logos/slack.svg',
     },
+    {
+        type: NodeType.NVIDIA,
+        label: 'Nvidia NIM',
+        description: 'Uses Nvidia NIM free preview models to generate text',
+        icon: '/logos/nvidia-color.svg',
+    },
+    {
+        type: NodeType.OPENROUTER,
+        label: 'OpenRouter',
+        description: 'Uses OpenRouter free models to generate text',
+        icon: '/logos/openrouter (1).svg',
+    },
+    {
+        type: NodeType.NOTION,
+        label: 'Notion',
+        description: 'Create pages, query databases, and manage content in Notion',
+        icon: '/logos/notion.svg',
+    },
+    {
+        type: NodeType.GMAIL,
+        label: 'Gmail',
+        description: 'Send emails via Gmail',
+        icon: '/logos/gmail.svg',
+    },
 ];
+
+const getDefaultNodeData = (type: NodeType): Record<string, unknown> => {
+    switch (type) {
+        case NodeType.NVIDIA:
+            return {
+                variableName: 'nvidia',
+                model: 'meta/llama-3.1-8b-instruct',
+                systemPrompt: 'You are a helpful assistant',
+                userPrompt: '',
+            };
+        case NodeType.OPENROUTER:
+            return {
+                variableName: 'openrouter',
+                model: 'meta-llama/llama-3-8b-instruct:free',
+                systemPrompt: 'You are a helpful assistant',
+                userPrompt: '',
+            };
+        case NodeType.OPENAI:
+            return {
+                variableName: 'openai',
+                systemPrompt: 'You are a helpful assistant',
+                userPrompt: '',
+            };
+        case NodeType.GEMINI:
+            return {
+                variableName: 'gemini',
+                systemPrompt: 'You are a helpful assistant',
+                userPrompt: '',
+            };
+        case NodeType.ANTHROPIC:
+            return {
+                variableName: 'anthropic',
+                systemPrompt: 'You are a helpful assistant',
+                userPrompt: '',
+            };
+        case NodeType.NOTION:
+            return {
+                variableName: 'notion',
+                action: 'create_page',
+                databaseId: '',
+                pageId: '',
+                content: '',
+                apiKey: '',
+            };
+        case NodeType.GMAIL:
+            return {
+                variableName: 'gmail',
+                to: '',
+                subject: '',
+                body: '',
+                smtpHost: 'smtp.gmail.com',
+                smtpPort: '587',
+                smtpUser: '',
+                smtpPass: '',
+            };
+        default:
+            return {};
+    }
+};
 
 interface NodeSelectorProps {
     open: boolean;
@@ -127,7 +210,7 @@ export function NodeSelector({
 
             const newNode = {
                 id: createId(),
-                data: {},
+                data: getDefaultNodeData(selection.type),
                 position: flowPosition,
                 type: selection.type,
             };

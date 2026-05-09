@@ -40,7 +40,15 @@ import Link from "next/link";
 const formSchema = z.object({
     name: z.string().min(1, 'Name is required'),
     type: z.enum(CredentialType),
-    value: z.string().min(1, 'API Key is required'),
+    value: z.string().optional(),
+}).refine((data) => {
+    // Gmail uses OAuth — no API key needed
+    if (data.type === CredentialType.GMAIL) return true;
+    // All other types require an API key
+    return !!data.value && data.value.length > 0;
+}, {
+    message: 'API Key is required',
+    path: ['value'],
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -60,6 +68,26 @@ const credentialTypeOptions = [
         value: CredentialType.ANTHROPIC,
         label: 'Anthropic',
         logo: '/logos/anthropic.svg',
+    },
+    {
+        value: CredentialType.NVIDIA,
+        label: 'Nvidia',
+        logo: '/logos/nvidia-color.svg',
+    },
+    {
+        value: CredentialType.OPENROUTER,
+        label: 'OpenRouter',
+        logo: '/logos/openrouter (1).svg',
+    },
+    {
+        value: CredentialType.NOTION,
+        label: 'Notion',
+        logo: '/logos/notion.svg',
+    },
+    {
+        value: CredentialType.GMAIL,
+        label: 'Gmail',
+        logo: '/logos/gmail.svg',
     },
 ];
 
@@ -91,14 +119,28 @@ export const CredentialForm = ({
         },
     });
 
+    const watchedType = form.watch('type');
+    const isGmail = watchedType === CredentialType.GMAIL;
+
+    const handleGoogleConnect = () => {
+        const name = form.getValues('name') || 'My Gmail';
+        window.location.href = `/api/oauth/google?name=${encodeURIComponent(name)}`;
+    };
+
     const onSubmit = async (values: FormValues) => {
         if (isEdit && initialData?.id) {
             await updateCredential.mutateAsync({
                 id: initialData.id,
-                ...values,
+                name: values.name,
+                type: values.type,
+                value: values.value || '',
             });
         } else {
-            await createCredential.mutateAsync(values, {
+            await createCredential.mutateAsync({
+                name: values.name,
+                type: values.type,
+                value: values.value || '',
+            }, {
                 onSuccess: (data) => {
                     router.push(`/credentials/${data.id}`);
                 },
@@ -136,7 +178,7 @@ export const CredentialForm = ({
                                     <FormItem>
                                         <FormLabel>Name</FormLabel>
                                         <FormControl>
-                                            <Input placeholder="My API key" {...field} />
+                                            <Input placeholder={isGmail ? "My Gmail Account" : "My API key"} {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -180,30 +222,61 @@ export const CredentialForm = ({
                                     </FormItem>
                                 )}
                             />
-                            <FormField
-                                control={form.control}
-                                name="value"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>API Key</FormLabel>
-                                        <FormControl>
-                                            <Input type="password" placeholder="sk-..." {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+
+                            {/* Show API Key field for non-Gmail types */}
+                            {!isGmail && (
+                                <FormField
+                                    control={form.control}
+                                    name="value"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>API Key</FormLabel>
+                                            <FormControl>
+                                                <Input type="password" placeholder="sk-..." {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            )}
+
+                            {/* Gmail OAuth info message */}
+                            {isGmail && !isEdit && (
+                                <div className="rounded-lg border border-blue-200 bg-blue-50 dark:border-blue-900 dark:bg-blue-950/30 p-4 text-sm text-blue-800 dark:text-blue-300">
+                                    <p className="font-medium mb-1">Google OAuth Connection</p>
+                                    <p>
+                                        Click the button below to securely connect your Gmail account via Google.
+                                        You&apos;ll be redirected to Google&apos;s consent screen to authorize sending emails on your behalf.
+                                    </p>
+                                </div>
+                            )}
 
                             <div className="flex gap-4">
-                                <Button
-                                    type="submit"
-                                    disabled={
-                                        createCredential.isPending ||
-                                        updateCredential.isPending
-                                    }
-                                >
-                                    {isEdit ? 'Update' : 'Create'}
-                                </Button>
+                                {isGmail && !isEdit ? (
+                                    <Button
+                                        type="button"
+                                        onClick={handleGoogleConnect}
+                                        className="gap-2"
+                                    >
+                                        <Image
+                                            src="/logos/gmail.svg"
+                                            alt="Google"
+                                            width={16}
+                                            height={16}
+                                        />
+                                        Connect with Google
+                                    </Button>
+                                ) : (
+                                    <Button
+                                        type="submit"
+                                        disabled={
+                                            createCredential.isPending ||
+                                            updateCredential.isPending
+                                        }
+                                    >
+                                        {isEdit ? 'Update' : 'Create'}
+                                    </Button>
+                                )}
                                 <Button
                                     type="button"
                                     variant={'outline'}

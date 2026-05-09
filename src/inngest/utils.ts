@@ -16,24 +16,21 @@ export const topologicalSort = (
         conn.toNodeId,
     ]);
 
-    //Add nodes with no connections to edges array as self-edges to ensure they're included
+    //Track which nodes are connected
     const connectedNodeIds = new Set<string>();
     for (const conn of connections) {
         connectedNodeIds.add(conn.fromNodeId);
         connectedNodeIds.add(conn.toNodeId);
-   }
+    }
 
-    for (const node of nodes) {
-        if (!connectedNodeIds.has(node.id)) {
-            edges.push([node.id, node.id]);
-        };
-    };
+    // Collect disconnected nodes separately (don't add self-edges — they cause false cycle detection)
+    const disconnectedNodes = nodes.filter((node) => !connectedNodeIds.has(node.id));
 
-    //Perfom topological sort
+    //Perform topological sort on connected edges only
     let sortedNodeIds: string[];
     try {
         sortedNodeIds = toposort(edges);
-        //Remove duplicate edges
+        //Remove duplicates
         sortedNodeIds = [...new Set(sortedNodeIds)];
     } catch (error) {
         if (error instanceof Error && error.message.includes('Cyclic')) {
@@ -41,9 +38,11 @@ export const topologicalSort = (
         }
         throw error;
     }
-    // Map sorted IDs back to node objects
+
+    // Map sorted IDs back to node objects, then append any disconnected nodes at the end
     const nodeMap = new Map(nodes.map((n) => [n.id, n]));
-    return sortedNodeIds.map((id) => nodeMap.get(id)!).filter(Boolean);
+    const sortedNodes = sortedNodeIds.map((id) => nodeMap.get(id)!).filter(Boolean);
+    return [...sortedNodes, ...disconnectedNodes];
 };
 
 export const sendWorkflowExecution = async (data: {

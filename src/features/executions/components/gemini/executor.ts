@@ -2,6 +2,7 @@ import Handlebars from 'handlebars';
 import type { NodeExecutor } from "@/features/executions/types";
 import { NonRetriableError } from "inngest";
 import { geminiChannel } from '@/inngest/channels/gemini';
+import { sanitizeTemplate } from '@/features/executions/lib/sanitize-template';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { generateText } from 'ai';
 import prisma from '@/lib/db';
@@ -17,6 +18,7 @@ Handlebars.registerHelper('json', (context) => {
 type geminiData = {
     variableName?: string;
     credentialId?: string;
+    modelId?: string;
     systemPrompt?: string;
     userPrompt?: string;
 };
@@ -73,9 +75,9 @@ export const geminiExecutor: NodeExecutor<geminiData> = async ({
     
 
     const systemPrompt = data.systemPrompt
-        ? Handlebars.compile(data.systemPrompt)(context)
+        ? Handlebars.compile(sanitizeTemplate(data.systemPrompt))(context)
         : 'You are a helpful assistant';
-    const userPrompt = Handlebars.compile(data.userPrompt)(context);
+    const userPrompt = Handlebars.compile(sanitizeTemplate(data.userPrompt))(context);
 
     
 
@@ -103,7 +105,7 @@ export const geminiExecutor: NodeExecutor<geminiData> = async ({
             'gemini-generate-text',
             generateText,
             {
-                model: google("gemini-2.5-flash"),
+                model: google(data.modelId || "gemini-2.5-flash"),
                 system: systemPrompt,
                 prompt: userPrompt,
                 experimental_telemetry: {

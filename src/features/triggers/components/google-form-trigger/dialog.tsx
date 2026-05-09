@@ -115,9 +115,9 @@ export const GoogleFormTriggerDialog = ({open, onOpenChange }: Props) => {
                             </li>
                             <li>
                                 <code className='bg-background px-1 py-0.4 rounded'>
-                                    {"{{googleForm.responses['Question Name']}}"}
+                                    {"{{googleForm.responses.Question_Name}}"}
                                 </code>
-                                - Specific answer
+                                - Specific answer (spaces become underscores)
                             </li>
                             <li>
                                 <code className='bg-background px-1 py-0.4 rounded'>
@@ -126,6 +126,10 @@ export const GoogleFormTriggerDialog = ({open, onOpenChange }: Props) => {
                                 - All responses as JSON
                             </li>
                         </ul>
+                        <p className='text-xs text-muted-foreground mt-2'>
+                            <strong>Note:</strong> Question names are sanitized — spaces and special characters become underscores.
+                            E.g., "Full Name" → <code className='bg-background px-1 py-0.4 rounded'>{"{{googleForm.responses.Full_Name}}"}</code>
+                        </p>
                     </div>
                 </div>
             </DialogContent>

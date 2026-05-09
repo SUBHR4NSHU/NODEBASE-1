@@ -11,6 +11,7 @@ import { fetchGeminiRealtimeToken } from './actions';
 type GeminiNodeData = {
     variableName?: string;
     credentialId?: string;
+    modelId?: string;
     systemPrompt?: string;
     userPrompt?: string;
 };
@@ -46,7 +47,8 @@ export const GeminiNode = memo((props: NodeProps<GeminiNodeType>) => {
     };
     
     const nodeData = props.data;
-    const description = nodeData?.userPrompt ? `gemini-2.5-flash: ${nodeData.userPrompt.slice(0, 50)}...` : 'Not configured';
+    const modelStr = nodeData?.modelId || 'gemini-2.5-flash';
+    const description = nodeData?.userPrompt ? `${modelStr}: ${nodeData.userPrompt.slice(0, 50)}...` : 'Not configured';
     
 
     return (

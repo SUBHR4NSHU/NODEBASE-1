@@ -3,6 +3,7 @@ import type { NodeExecutor } from "@/features/executions/types";
 import { NonRetriableError } from "inngest";
 import ky, { type Options as KyOptions } from "ky";
 import { httpRequestChannel } from '../../../../inngest/channels/http-request';
+import { sanitizeTemplate } from '@/features/executions/lib/sanitize-template';
 
 Handlebars.registerHelper('json', (context) => {
     const jsonString = JSON.stringify(context, null, 2);
@@ -73,14 +74,14 @@ export const httpRequestExecutor: NodeExecutor<HttpRequestData> = async ({
                 throw new NonRetriableError('Method not configured');
             }
         
-            const endpoint = Handlebars.compile(data.endpoint)(context);
+            const endpoint = Handlebars.compile(sanitizeTemplate(data.endpoint))(context);
             console.log('ENDPOINT', { endpoint });
             const method = data.method;
 
             const options: KyOptions = { method };
 
             if (['POST', 'PUT', 'PATCH'].includes(method)) {
-                const resolved = Handlebars.compile(data.body || '{}')(context);
+                const resolved = Handlebars.compile(sanitizeTemplate(data.body || '{}'))(context);
                 console.log(resolved);
                 JSON.parse(resolved);
                 options.body = resolved;
