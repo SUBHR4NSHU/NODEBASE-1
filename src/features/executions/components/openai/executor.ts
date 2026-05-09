@@ -4,6 +4,7 @@ import { NonRetriableError } from "inngest";
 import { createOpenAI } from '@ai-sdk/openai';
 import { generateText } from 'ai';
 import { openaiChannel } from '@/inngest/channels/openai';
+import { sanitizeTemplate } from '@/features/executions/lib/sanitize-template';
 import prisma from '@/lib/db';
 import { decrypt } from '@/lib/encryption';
 
@@ -72,9 +73,9 @@ export const openaiExecutor: NodeExecutor<OpenAiData> = async ({
     };
 
     const systemPrompt = data.systemPrompt
-        ? Handlebars.compile(data.systemPrompt)(context)
+        ? Handlebars.compile(sanitizeTemplate(data.systemPrompt))(context)
         : 'You are a helpful assistant';
-    const userPrompt = Handlebars.compile(data.userPrompt)(context);
+    const userPrompt = Handlebars.compile(sanitizeTemplate(data.userPrompt))(context);
 
     const credential = await step.run('get-credential', async () => {
 

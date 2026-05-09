@@ -9,6 +9,10 @@ import { openaiExecutor } from "../components/openai/executor";
 import { anthropicExecutor } from "../components/anthropic/executor";
 import { discordExecutor } from "../components/discord/executor";
 import { slackExecutor } from "../components/slack/executor";
+import { nvidiaExecutor } from "../components/nvidia/executor";
+import { openrouterExecutor } from "../components/openrouter/executor";
+import { notionExecutor } from "../components/notion/executor";
+import { gmailExecutor } from "../components/gmail/executor";
 
 export const executorRegistry: Record<NodeType, NodeExecutor> = {
     [NodeType.MANUAL_TRIGGER]: manualTriggerExecutor,
@@ -20,7 +24,11 @@ export const executorRegistry: Record<NodeType, NodeExecutor> = {
     [NodeType.ANTHROPIC]: anthropicExecutor,
     [NodeType.OPENAI]: openaiExecutor,
     [NodeType.DISCORD]: discordExecutor,
-    [NodeType.SLACK]: slackExecutor,   
+    [NodeType.SLACK]: slackExecutor,
+    [NodeType.NVIDIA]: nvidiaExecutor,
+    [NodeType.OPENROUTER]: openrouterExecutor,
+    [NodeType.NOTION]: notionExecutor,
+    [NodeType.GMAIL]: gmailExecutor,
 };
 
 export const getExecutor = (type: NodeType): NodeExecutor => {

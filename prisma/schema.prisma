@@ -88,6 +88,10 @@ enum CredentialType {
   OPENAI
   ANTHROPIC
   GEMINI
+  NVIDIA
+  OPENROUTER
+  NOTION
+  GMAIL
 }
 
 model Workflow {
@@ -117,6 +121,10 @@ enum NodeType {
   OPENAI
   DISCORD
   SLACK
+  NVIDIA
+  OPENROUTER
+  NOTION
+  GMAIL
 }
 
 model Node {

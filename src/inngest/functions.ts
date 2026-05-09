@@ -14,11 +14,16 @@ import { openaiChannel } from "./channels/openai";
 import { anthropicChannel } from "./channels/anthropic";
 import { discordChannel } from "./channels/discord";
 import { slackChannel } from "./channels/slack";
+import { nvidiaChannel } from "./channels/nvidia";
+import { openrouterChannel } from "./channels/openrouter";
+import { notionChannel } from "./channels/notion";
+import { gmailChannel } from "./channels/gmail";
 
 export const executeWorkflow = inngest.createFunction(
   { 
     id: "execute-workflow",
     retries: process.env.NODE_ENV === 'production' ? 3 : 0,
+    // retries: 3,
     onFailure: async ({ event, step }) => {
       return prisma.execution.update({
         where: { inngestEventId: event.data.event.id },
@@ -42,6 +47,10 @@ export const executeWorkflow = inngest.createFunction(
       anthropicChannel(),
       discordChannel(),
       slackChannel(),
+      nvidiaChannel(),
+      openrouterChannel(),
+      notionChannel(),
+      gmailChannel(),
     ],
   },
   async ({ event, step, publish }) => {

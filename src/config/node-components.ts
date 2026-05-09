@@ -2,8 +2,12 @@ import { InitialNode } from "@/components/initial-node";
 import { AnthropicNode } from "@/features/executions/components/anthropic/node";
 import { DiscordNode } from "@/features/executions/components/discord/node";
 import { GeminiNode } from "@/features/executions/components/gemini/node";
+import { GmailNode } from "@/features/executions/components/gmail/node";
 import { HttpRequestNode } from "@/features/executions/components/http-request/node";
+import { NotionNode } from "@/features/executions/components/notion/node";
+import { NvidiaNode } from "@/features/executions/components/nvidia/node";
 import { OpenAiNode } from "@/features/executions/components/openai/node";
+import { OpenRouterNode } from "@/features/executions/components/openrouter/node";
 import { SlackNode } from "@/features/executions/components/slack/node";
 import { GoogleFormTrigger } from "@/features/triggers/components/google-form-trigger/node";
 import { ManualTriggerNode } from "@/features/triggers/components/manual-trigger/node";
@@ -22,6 +26,10 @@ export const nodeComponents = {
     [NodeType.ANTHROPIC]: AnthropicNode,
     [NodeType.DISCORD]: DiscordNode,
     [NodeType.SLACK]: SlackNode,
+    [NodeType.NVIDIA]: NvidiaNode,
+    [NodeType.OPENROUTER]: OpenRouterNode,
+    [NodeType.NOTION]: NotionNode,
+    [NodeType.GMAIL]: GmailNode,
 } as const satisfies NodeTypes;
 
 export type RegisteredNodeType = keyof typeof nodeComponents; 

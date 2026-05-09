@@ -15,13 +15,24 @@ export async function POST(request: NextRequest) {
 
         const body = await request.json();
 
+        // Sanitize response keys: replace spaces/special chars with underscores
+        // so Handlebars templates can use dot notation (e.g. {{googleForm.responses.Full_Name}})
+        const sanitizedResponses: Record<string, unknown> = {};
+        if (body.responses && typeof body.responses === 'object') {
+            for (const [key, value] of Object.entries(body.responses)) {
+                const sanitizedKey = key.replace(/[^a-zA-Z0-9]/g, '_');
+                sanitizedResponses[sanitizedKey] = value;
+            }
+        }
+
         const formData = {
             formId: body.formId,
             formTitle: body.formTitle,
             responseId: body.responseId,
             timestamp: body.timestamp,
             respondentEmail: body.respondentEmail,
-            responses: body.responses,
+            responses: sanitizedResponses,
+            rawResponses: body.responses, // preserve original keys
             raw: body,
         };
 

@@ -37,6 +37,73 @@ import {
     SelectContent
 } from '@/components/ui/select';
 
+const GEMINI_MODELS = [
+    // { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash' },
+    // { id: 'gemini-2.5-pro', name: 'Gemini 2.5 Pro' },
+    // { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash' },
+    // { id: 'gemini-2.0-flash-lite', name: 'Gemini 2.0 Flash Lite' },
+    // { id: 'gemini-2.5-flash-preview-tts', name: 'Gemini 2.5 Flash TTS' },
+    // { id: 'gemini-2.0-pro-exp', name: 'Gemini 2.0 Pro Experimental' },
+    // { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash' },
+    // { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro' },
+    // { id: 'gemini-1.5-flash-8b', name: 'Gemini 1.5 Flash-8B' },
+    // Text
+  { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash' },
+  { id: 'gemini-2.5-flash-lite', name: 'Gemini 2.5 Flash Lite' },
+  { id: 'gemini-2.5-pro', name: 'Gemini 2.5 Pro' },
+  { id: 'gemini-3-flash', name: 'Gemini 3 Flash' },
+  { id: 'gemini-3.1-flash-lite', name: 'Gemini 3.1 Flash Lite' },
+  { id: 'gemini-3.1-pro', name: 'Gemini 3.1 Pro' },
+  { id: 'gemini-2.0-flash', name: 'Gemini 2 Flash' },
+  { id: 'gemini-2.0-flash-lite', name: 'Gemini 2 Flash Lite' },
+  { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash' },
+  { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro' },
+  { id: 'gemini-1.5-flash-8b', name: 'Gemini 1.5 Flash-8B' },
+
+  // Audio / TTS / Live
+  { id: 'gemini-2.5-flash-preview-native-audio-dialog', name: 'Gemini 2.5 Native Audio' },
+  { id: 'gemini-3-flash-live', name: 'Gemini 3 Flash Live' },
+  { id: 'gemini-2.5-flash-preview-tts', name: 'Gemini 2.5 Flash TTS' },
+  { id: 'gemini-3.1-flash-tts', name: 'Gemini 3.1 Flash TTS' },
+  { id: 'gemini-2.5-pro-preview-tts', name: 'Gemini 2.5 Pro TTS' },
+
+  // Image
+  { id: 'imagen-4-generate', name: 'Imagen 4' },
+  { id: 'imagen-4-ultra-generate', name: 'Imagen 4 Ultra' },
+  { id: 'imagen-4-fast-generate', name: 'Imagen 4 Fast' },
+  { id: 'gemini-2.5-flash-image-preview', name: 'Nano Banana' },
+  { id: 'gemini-3-pro-image', name: 'Nano Banana Pro' },
+  { id: 'gemini-3.1-flash-image', name: 'Nano Banana 2' },
+
+  // Video / Music
+  { id: 'lyria-3-clip', name: 'Lyria 3 Clip' },
+  { id: 'lyria-3-pro', name: 'Lyria 3 Pro' },
+  { id: 'veo-3-generate', name: 'Veo 3' },
+  { id: 'veo-3-fast-generate', name: 'Veo 3 Fast' },
+  { id: 'veo-3-lite-generate', name: 'Veo 3 Lite' },
+
+  // Gemma
+  { id: 'gemma-3-1b-it', name: 'Gemma 3 1B' },
+  { id: 'gemma-3-2b-it', name: 'Gemma 3 2B' },
+  { id: 'gemma-3-4b-it', name: 'Gemma 3 4B' },
+  { id: 'gemma-3-12b-it', name: 'Gemma 3 12B' },
+  { id: 'gemma-3-27b-it', name: 'Gemma 3 27B' },
+  { id: 'gemma-4-26b-it', name: 'Gemma 4 26B' },
+  { id: 'gemma-4-31b-it', name: 'Gemma 4 31B' },
+
+  // Embeddings
+  { id: 'gemini-embedding-001', name: 'Gemini Embedding 1' },
+  { id: 'gemini-embedding-002', name: 'Gemini Embedding 2' },
+  { id: 'text-embedding-004', name: 'Text Embedding 004' },
+  { id: 'embedding-001', name: 'Embedding 001' },
+
+  // Robotics / Agents
+  { id: 'gemini-robotics-er-1.5-preview', name: 'Gemini Robotics ER 1.5' },
+  { id: 'gemini-robotics-er-1.6-preview', name: 'Gemini Robotics ER 1.6' },
+  { id: 'deep-research-pro-preview', name: 'Deep Research Pro' },
+  { id: 'computer-use-preview', name: 'Computer Use Preview' },
+];
+
 const formSchema = z.object({
     variableName: z
     .string()
@@ -45,6 +112,7 @@ const formSchema = z.object({
         message: 'Variable name must start with a letter or underscore and contain only letters, numbers and underscores.'
     }),
     credentialId: z.string().min(1, 'Credential is required'),
+    modelId: z.string().min(1, 'Model is required'),
     systemPrompt: z.string().optional(),
     userPrompt: z.string().min(1, 'User prompt is required'),
 });
@@ -74,6 +142,7 @@ export const GeminiDialog = ({
         defaultValues: {
             variableName: defaultValues.variableName || '',
             credentialId: defaultValues.credentialId || '',
+            modelId: defaultValues.modelId || 'gemini-2.5-flash',
             systemPrompt: defaultValues.systemPrompt || '',
             userPrompt: defaultValues.userPrompt || '',
         },
@@ -85,6 +154,7 @@ export const GeminiDialog = ({
             form.reset({
                 variableName: defaultValues.variableName || '',
                 credentialId: defaultValues.credentialId || '',
+                modelId: defaultValues.modelId || 'gemini-2.5-flash',
                 systemPrompt: defaultValues.systemPrompt || '',
                 userPrompt: defaultValues.userPrompt || '',
             })
@@ -166,6 +236,36 @@ export const GeminiDialog = ({
                                                         />
                                                         {credential.name}
                                                     </div>
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="modelId"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Model</FormLabel>
+                                    <Select
+                                        onValueChange={field.onChange}
+                                        defaultValue={field.value}
+                                    >
+                                        <FormControl>
+                                            <SelectTrigger className="w-full">
+                                                <SelectValue placeholder="Select a model" />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            {GEMINI_MODELS.map((model) => (
+                                                <SelectItem
+                                                    key={model.id}
+                                                    value={model.id}
+                                                >
+                                                    {model.name}
                                                 </SelectItem>
                                             ))}
                                         </SelectContent>

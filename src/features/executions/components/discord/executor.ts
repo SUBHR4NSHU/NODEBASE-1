@@ -3,6 +3,7 @@ import { decode } from 'html-entities';
 import type { NodeExecutor } from "@/features/executions/types";
 import { NonRetriableError } from "inngest";
 import { discordChannel } from '@/inngest/channels/discord';
+import { sanitizeTemplate } from '@/features/executions/lib/sanitize-template';
 import ky from 'ky';
 
 Handlebars.registerHelper('json', (context) => {
@@ -48,7 +49,7 @@ export const discordExecutor: NodeExecutor<DiscordData> = async ({
     };
  
 
-    const rawContent = Handlebars.compile(data.content)(context);
+    const rawContent = Handlebars.compile(sanitizeTemplate(data.content))(context);
     const content = decode(rawContent);
     const username = data.username ? decode(data.username) : undefined;
   
